@@ -9,3 +9,6 @@ _sdk_tmp/
 *.log
 dist/
 release/
+
+streamdock-http-request.zip
+
