@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>HTTP Request</title>
+  <link rel="stylesheet" href="../../static/css/sdpi.css" />
+  <style>
+    body { margin: 0; background: #2d2d2d; color: #fff; }
+    .sdpi-wrapper { display: none; }
+    .hint { opacity: 0.7; font-size: 11px; padding: 0 0 8px 0; }
+    #result {
+      margin: 8px 0 0;
+      padding: 8px;
+      border-radius: 4px;
+      background: #1e1e1e;
+      font-family: Consolas, monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      min-height: 2em;
+    }
+    #result.ok { color: #7dcea0; }
+    #result.err { color: #f1948a; }
+  </style>
+</head>
+<body>
+  <div class="sdpi-wrapper">
+    <div class="sdpi-item">
+      <div class="sdpi-item-label">Preset</div>
+      <select class="sdpi-item-value select" id="preset">
+        <option value="custom">Custom</option>
+        <option value="win">Widget Win</option>
+        <option value="loss">Widget Loss</option>
+        <option value="rank_up">Widget Rank Up</option>
+        <option value="rank_down">Widget Rank Down</option>
+        <option value="reset">Widget Reset</option>
+      </select>
+    </div>
+
+    <div class="sdpi-item">
+      <div class="sdpi-item-label">URL</div>
+      <input class="sdpi-item-value" id="url" type="text" placeholder="http://127.0.0.1:19123/api/win" />
+    </div>
+
+    <div class="sdpi-item">
+      <div class="sdpi-item-label">Method</div>
+      <select class="sdpi-item-value select" id="method">
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="PATCH">PATCH</option>
+        <option value="DELETE">DELETE</option>
+        <option value="HEAD">HEAD</option>
+      </select>
+    </div>
+
+    <div class="sdpi-item">
+      <div class="sdpi-item-label">Content-Type</div>
+      <select class="sdpi-item-value select" id="contentType">
+        <option value="application/json">application/json</option>
+        <option value="application/x-www-form-urlencoded">application/x-www-form-urlencoded</option>
+        <option value="text/plain">text/plain</option>
+        <option value="">(none)</option>
+      </select>
+    </div>
+
+    <div type="textarea" class="sdpi-item">
+      <div class="sdpi-item-label">Headers (JSON)</div>
+      <textarea class="sdpi-item-value" id="headers" rows="3" placeholder='{"Authorization":"Bearer ..."}'></textarea>
+    </div>
+
+    <div type="textarea" class="sdpi-item">
+      <div class="sdpi-item-label">Body</div>
+      <textarea class="sdpi-item-value" id="body" rows="4" placeholder='{"ok":true}'></textarea>
+    </div>
+
+    <div class="sdpi-item">
+      <div class="sdpi-item-label">Timeout (ms)</div>
+      <input class="sdpi-item-value" id="timeout" type="number" min="500" step="100" value="5000" />
+    </div>
+
+    <div class="sdpi-item">
+      <div class="sdpi-item-label">Show status on key</div>
+      <input class="sdpi-item-value" id="showStatus" type="checkbox" checked />
+    </div>
+
+    <div class="sdpi-item">
+      <button class="sdpi-item-value" id="testBtn" type="button">Test request</button>
+    </div>
+
+    <div class="hint">Works silently — no browser tabs. Default port for Widget Stats v2 is 19123.</div>
+    <div id="result"></div>
+  </div>
+
+  <script src="../utils/common.js"></script>
+  <script src="../utils/action.js"></script>
+  <script src="./index.js"></script>
+</body>
+</html>

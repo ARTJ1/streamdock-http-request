@@ -1,0 +1,26 @@
+{
+  "Name": "HTTP Request",
+  "Description": "Тихие HTTP-запросы для Stream Dock / AJAZZ",
+  "Category": "HTTP Request",
+  "com.kdfx.streamdock.httprequest.request": {
+    "Name": "HTTP Request",
+    "Tooltip": "Отправить HTTP-запрос без открытия браузера"
+  },
+  "Localization": {
+    "Preset": "Пресет",
+    "Custom": "Свой",
+    "URL": "URL",
+    "Method": "Метод",
+    "Headers (JSON)": "Заголовки (JSON)",
+    "Body": "Тело",
+    "Content-Type": "Content-Type",
+    "Show status on key": "Статус на кнопке",
+    "Timeout (ms)": "Таймаут (мс)",
+    "Test request": "Тест запроса",
+    "Widget Win": "Виджет: Победа +1",
+    "Widget Loss": "Виджет: Поражение +1",
+    "Widget Rank Up": "Виджет: Ранг вверх",
+    "Widget Rank Down": "Виджет: Ранг вниз",
+    "Widget Reset": "Виджет: Сброс W/L"
+  }
+}

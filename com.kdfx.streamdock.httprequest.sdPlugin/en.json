@@ -1,0 +1,26 @@
+{
+  "Name": "HTTP Request",
+  "Description": "Silent HTTP requests for Stream Dock / AJAZZ",
+  "Category": "HTTP Request",
+  "com.kdfx.streamdock.httprequest.request": {
+    "Name": "HTTP Request",
+    "Tooltip": "Send HTTP request without opening a browser"
+  },
+  "Localization": {
+    "Preset": "Preset",
+    "Custom": "Custom",
+    "URL": "URL",
+    "Method": "Method",
+    "Headers (JSON)": "Headers (JSON)",
+    "Body": "Body",
+    "Content-Type": "Content-Type",
+    "Show status on key": "Show status on key",
+    "Timeout (ms)": "Timeout (ms)",
+    "Test request": "Test request",
+    "Widget Win": "Widget: Win +1",
+    "Widget Loss": "Widget: Loss +1",
+    "Widget Rank Up": "Widget: Rank Up",
+    "Widget Rank Down": "Widget: Rank Down",
+    "Widget Reset": "Widget: Reset W/L"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "Name": "HTTP Request",
+  "Description": "Stream Dock / AJAZZ 静默 HTTP 请求",
+  "Category": "HTTP Request",
+  "com.kdfx.streamdock.httprequest.request": {
+    "Name": "HTTP Request",
+    "Tooltip": "发送 HTTP 请求，不打开浏览器"
+  },
+  "Localization": {
+    "Preset": "预设",
+    "Custom": "自定义",
+    "URL": "URL",
+    "Method": "方法",
+    "Headers (JSON)": "请求头 (JSON)",
+    "Body": "请求体",
+    "Content-Type": "Content-Type",
+    "Show status on key": "按键显示状态",
+    "Timeout (ms)": "超时 (ms)",
+    "Test request": "测试请求",
+    "Widget Win": "小组件: 胜 +1",
+    "Widget Loss": "小组件: 负 +1",
+    "Widget Rank Up": "小组件: 段位升",
+    "Widget Rank Down": "小组件: 段位降",
+    "Widget Reset": "小组件: 重置 W/L"
+  }
+}

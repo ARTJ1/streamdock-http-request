@@ -1,0 +1,20 @@
+{
+  "name": "streamdock-http-request",
+  "version": "1.0.0",
+  "author": "KDFX",
+  "main": "index.js",
+  "description": "Silent HTTP requests for Stream Dock / AJAZZ",
+  "scripts": {
+    "build": "ncc build index.js -m -o ./build && node autofile.js",
+    "install-plugin": "node autofile.js --dev"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^11.3.0",
+    "log4js": "^6.9.1",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.3"
+  }
+}
