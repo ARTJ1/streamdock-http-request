@@ -1,0 +1,12 @@
+{
+  "name": "streamdock-http-request",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Silent HTTP Request plugin for AJAZZ / Stream Dock",
+  "scripts": {
+    "install:deps": "npm install --prefix com.kdfx.streamdock.httprequest.sdPlugin/plugin",
+    "build": "npm run build --prefix com.kdfx.streamdock.httprequest.sdPlugin/plugin",
+    "install-plugin": "npm run install-plugin --prefix com.kdfx.streamdock.httprequest.sdPlugin/plugin"
+  },
+  "license": "MIT"
+}

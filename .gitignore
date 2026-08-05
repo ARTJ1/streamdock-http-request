@@ -1,0 +1,11 @@
+node_modules/
+**/node_modules/
+**/plugin/build/
+**/plugin/log/
+**/log/
+.DS_Store
+.vscode/
+_sdk_tmp/
+*.log
+dist/
+release/
