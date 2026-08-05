@@ -1,0 +1,62 @@
+name: Build plugin
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: com.kdfx.streamdock.httprequest.sdPlugin/plugin/package-lock.json
+
+      - name: Install dependencies
+        working-directory: com.kdfx.streamdock.httprequest.sdPlugin/plugin
+        run: npm ci
+
+      - name: Bundle with ncc
+        working-directory: com.kdfx.streamdock.httprequest.sdPlugin/plugin
+        run: npx ncc build index.js -m -o ./build
+
+      - name: Package .sdPlugin zip
+        run: |
+          mkdir -p dist/com.kdfx.streamdock.httprequest.sdPlugin/plugin
+          rsync -a \
+            --exclude 'plugin/node_modules' \
+            --exclude 'plugin/build' \
+            --exclude 'plugin/log' \
+            --exclude 'plugin/index.js' \
+            --exclude 'plugin/package.json' \
+            --exclude 'plugin/package-lock.json' \
+            --exclude 'plugin/utils' \
+            --exclude 'plugin/autofile.js' \
+            com.kdfx.streamdock.httprequest.sdPlugin/ \
+            dist/com.kdfx.streamdock.httprequest.sdPlugin/
+          cp com.kdfx.streamdock.httprequest.sdPlugin/plugin/build/index.js \
+            dist/com.kdfx.streamdock.httprequest.sdPlugin/plugin/index.js
+          cd dist
+          zip -r ../streamdock-http-request.zip com.kdfx.streamdock.httprequest.sdPlugin
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: streamdock-http-request
+          path: streamdock-http-request.zip
+
+      - name: Attach to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: streamdock-http-request.zip
