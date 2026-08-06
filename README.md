@@ -2,7 +2,7 @@
 
 Плагин для **AJAZZ / Stream Dock** (MiraBox HotSpot): тихие HTTP-запросы **без открытия вкладок браузера**.
 
-Подходит для локальных API вроде [OBS Stream Widget Statistics v2](https://github.com/) (`http://127.0.0.1:19123/api/...`).
+Подходит для локальных API вроде [OBS Stream Widget Statistics v2]([https://github.com/](https://github.com/ARTJ1/OBS-Stream-Widget-Statistics-v2/releases)) (`http://127.0.0.1:19123/api/...`). [пак кнопок для этого виджета](https://github.com/ARTJ1/OBS-Stream-Widget-Statistics-v2/releases/tag/streamdock-icons-v1.0.0)
 
 ## Возможности
 
