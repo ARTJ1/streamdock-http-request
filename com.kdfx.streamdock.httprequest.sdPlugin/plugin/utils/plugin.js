@@ -49,7 +49,7 @@ class Plugins {
       const action = data.action?.split('.').pop();
       this[action]?.[data.event]?.(data);
       if (data.event === 'didReceiveGlobalSettings') {
-        Plugins.globalSettings = data.payload.settings;
+        Plugins.globalSettings = data.payload?.settings || {};
       }
       this[data.event]?.(data);
     });

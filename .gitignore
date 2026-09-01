@@ -12,3 +12,10 @@ release/
 
 streamdock-http-request.zip
 
+
+icons/preview/
+icons/preview-live/
+icons/preview-live-variants/
+icons/node_modules/
+icons/package-lock.json
+icons/preview-live-*.js

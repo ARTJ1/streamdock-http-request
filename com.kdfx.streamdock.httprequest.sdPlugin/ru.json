@@ -4,7 +4,7 @@
   "Category": "HTTP Request",
   "com.kdfx.streamdock.httprequest.request": {
     "Name": "HTTP Request",
-    "Tooltip": "Отправить HTTP-запрос без открытия браузера"
+    "Tooltip": "Тихий HTTP + Live Mode для Widget Stats"
   },
   "Localization": {
     "Preset": "Пресет",
@@ -17,10 +17,32 @@
     "Show status on key": "Статус на кнопке",
     "Timeout (ms)": "Таймаут (мс)",
     "Test request": "Тест запроса",
+    "Live Mode": "Live Mode",
+    "Widget URL": "URL виджета",
+    "Live display": "Live-отображение",
+    "Auto (from preset)": "Авто (по пресету)",
+    "Wins number": "Число побед",
+    "Losses number": "Число поражений",
+    "Rank icon + label": "Иконка ранга + подпись",
+    "Current role": "Текущая роль",
+    "Off (this button)": "Выкл (эта кнопка)",
     "Widget Win": "Виджет: Победа +1",
+    "Widget Win -1": "Виджет: Победа −1",
     "Widget Loss": "Виджет: Поражение +1",
+    "Widget Loss -1": "Виджет: Поражение −1",
+    "Widget Current Rank": "Виджет: Текущий ранг",
     "Widget Rank Up": "Виджет: Ранг вверх",
     "Widget Rank Down": "Виджет: Ранг вниз",
-    "Widget Reset": "Виджет: Сброс W/L"
+    "Widget Reset": "Виджет: Сброс W/L",
+    "Widget Game Next": "Виджет: След. игра",
+    "Widget Mode Next": "Виджет: След. режим",
+    "Widget Role Next": "Виджет: След. роль",
+    "Widget Show Overlay": "Виджет: Показать оверлей",
+    "Rank↑ Tank": "Ранг↑ Танк",
+    "Rank↑ Support": "Ранг↑ Поддержка",
+    "Rank↑ Damage": "Ранг↑ Урон",
+    "Rank↓ Tank": "Ранг↓ Танк",
+    "Rank↓ Support": "Ранг↓ Поддержка",
+    "Rank↓ Damage": "Ранг↓ Урон"
   }
 }

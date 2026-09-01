@@ -8,6 +8,16 @@
     body { margin: 0; background: #2d2d2d; color: #fff; }
     .sdpi-wrapper { display: none; }
     .hint { opacity: 0.7; font-size: 11px; padding: 0 0 8px 0; }
+    .live-box {
+      margin: 4px 0 10px;
+      padding: 8px;
+      border-radius: 4px;
+      background: #1e1e1e;
+      border: 1px solid #3a3a3a;
+    }
+    .live-status { font-size: 11px; margin-top: 6px; opacity: 0.9; }
+    .live-status.ok { color: #7dcea0; }
+    .live-status.err { color: #f1948a; }
     #result {
       margin: 8px 0 0;
       padding: 8px;
@@ -25,15 +35,52 @@
 </head>
 <body>
   <div class="sdpi-wrapper">
+    <div class="live-box">
+      <div class="sdpi-item">
+        <div class="sdpi-item-label">Live Mode</div>
+        <input class="sdpi-item-value" id="liveMode" type="checkbox" />
+      </div>
+      <div class="sdpi-item">
+        <div class="sdpi-item-label">Widget URL</div>
+        <input class="sdpi-item-value" id="baseUrl" type="text" placeholder="http://127.0.0.1:19123" />
+      </div>
+      <div class="sdpi-item">
+        <div class="sdpi-item-label">Live display</div>
+        <select class="sdpi-item-value select" id="liveDisplay">
+          <option value="auto">Auto (from preset)</option>
+          <option value="wins">Wins number</option>
+          <option value="losses">Losses number</option>
+          <option value="rank">Rank icon + label</option>
+          <option value="role">Current role</option>
+          <option value="none">Off (this button)</option>
+        </select>
+      </div>
+      <div id="liveStatus" class="live-status">Live: off</div>
+      <div class="hint">Live Mode connects to the widget and updates button titles/icons when stats change (deck, admin, automation).</div>
+    </div>
+
     <div class="sdpi-item">
       <div class="sdpi-item-label">Preset</div>
       <select class="sdpi-item-value select" id="preset">
         <option value="custom">Custom</option>
         <option value="win">Widget Win</option>
+        <option value="win_down">Widget Win -1</option>
         <option value="loss">Widget Loss</option>
+        <option value="loss_down">Widget Loss -1</option>
+        <option value="rank">Widget Current Rank</option>
         <option value="rank_up">Widget Rank Up</option>
         <option value="rank_down">Widget Rank Down</option>
         <option value="reset">Widget Reset</option>
+        <option value="game_next">Widget Game Next</option>
+        <option value="mode_next">Widget Mode Next</option>
+        <option value="role_next">Widget Role Next</option>
+        <option value="show">Widget Show Overlay</option>
+        <option value="rank_up_tank">Rank↑ Tank</option>
+        <option value="rank_up_support">Rank↑ Support</option>
+        <option value="rank_up_damage">Rank↑ Damage</option>
+        <option value="rank_down_tank">Rank↓ Tank</option>
+        <option value="rank_down_support">Rank↓ Support</option>
+        <option value="rank_down_damage">Rank↓ Damage</option>
       </select>
     </div>
 

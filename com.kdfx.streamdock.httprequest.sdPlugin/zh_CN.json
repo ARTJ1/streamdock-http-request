@@ -4,7 +4,7 @@
   "Category": "HTTP Request",
   "com.kdfx.streamdock.httprequest.request": {
     "Name": "HTTP Request",
-    "Tooltip": "发送 HTTP 请求，不打开浏览器"
+    "Tooltip": "静默 HTTP + Widget Stats Live Mode"
   },
   "Localization": {
     "Preset": "预设",
@@ -17,10 +17,32 @@
     "Show status on key": "按键显示状态",
     "Timeout (ms)": "超时 (ms)",
     "Test request": "测试请求",
+    "Live Mode": "Live Mode",
+    "Widget URL": "组件 URL",
+    "Live display": "实时显示",
+    "Auto (from preset)": "自动（按预设）",
+    "Wins number": "胜场数字",
+    "Losses number": "负场数字",
+    "Rank icon + label": "段位图标+文字",
+    "Current role": "当前角色",
+    "Off (this button)": "关闭（此键）",
     "Widget Win": "小组件: 胜 +1",
+    "Widget Win -1": "小组件: 胜 −1",
     "Widget Loss": "小组件: 负 +1",
+    "Widget Loss -1": "小组件: 负 −1",
+    "Widget Current Rank": "小组件: 当前段位",
     "Widget Rank Up": "小组件: 段位升",
     "Widget Rank Down": "小组件: 段位降",
-    "Widget Reset": "小组件: 重置 W/L"
+    "Widget Reset": "小组件: 重置 W/L",
+    "Widget Game Next": "小组件: 下一游戏",
+    "Widget Mode Next": "小组件: 下一模式",
+    "Widget Role Next": "小组件: 下一角色",
+    "Widget Show Overlay": "小组件: 显示 Overlay",
+    "Rank↑ Tank": "段位↑ 坦克",
+    "Rank↑ Support": "段位↑ 辅助",
+    "Rank↑ Damage": "段位↑ 输出",
+    "Rank↓ Tank": "段位↓ 坦克",
+    "Rank↓ Support": "段位↓ 辅助",
+    "Rank↓ Damage": "段位↓ 输出"
   }
 }

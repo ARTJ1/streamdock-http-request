@@ -4,7 +4,7 @@
   "Category": "HTTP Request",
   "com.kdfx.streamdock.httprequest.request": {
     "Name": "HTTP Request",
-    "Tooltip": "Send HTTP request without opening a browser"
+    "Tooltip": "Silent HTTP + Live Mode for Widget Stats"
   },
   "Localization": {
     "Preset": "Preset",
@@ -17,10 +17,32 @@
     "Show status on key": "Show status on key",
     "Timeout (ms)": "Timeout (ms)",
     "Test request": "Test request",
+    "Live Mode": "Live Mode",
+    "Widget URL": "Widget URL",
+    "Live display": "Live display",
+    "Auto (from preset)": "Auto (from preset)",
+    "Wins number": "Wins number",
+    "Losses number": "Losses number",
+    "Rank icon + label": "Rank icon + label",
+    "Current role": "Current role",
+    "Off (this button)": "Off (this button)",
     "Widget Win": "Widget: Win +1",
+    "Widget Win -1": "Widget: Win −1",
     "Widget Loss": "Widget: Loss +1",
+    "Widget Loss -1": "Widget: Loss −1",
+    "Widget Current Rank": "Widget: Current Rank",
     "Widget Rank Up": "Widget: Rank Up",
     "Widget Rank Down": "Widget: Rank Down",
-    "Widget Reset": "Widget: Reset W/L"
+    "Widget Reset": "Widget: Reset W/L",
+    "Widget Game Next": "Widget: Game Next",
+    "Widget Mode Next": "Widget: Mode Next",
+    "Widget Role Next": "Widget: Role Next",
+    "Widget Show Overlay": "Widget: Show Overlay",
+    "Rank↑ Tank": "Rank↑ Tank",
+    "Rank↑ Support": "Rank↑ Support",
+    "Rank↑ Damage": "Rank↑ Damage",
+    "Rank↓ Tank": "Rank↓ Tank",
+    "Rank↓ Support": "Rank↓ Support",
+    "Rank↓ Damage": "Rank↓ Damage"
   }
 }
