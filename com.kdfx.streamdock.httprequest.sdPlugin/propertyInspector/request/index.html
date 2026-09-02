@@ -35,33 +35,33 @@
 </head>
 <body>
   <div class="sdpi-wrapper" style="display:block">
-    <div class="hint" style="padding:8px;margin:0 0 8px;background:#1a3a2a;border:1px solid #2e7d4f;border-radius:4px;opacity:1">
-      Нажатия (Win/Loss) работают всегда. Галка «Цифры» — глобально показать/скрыть числа.
-      Для одной кнопки: Live display → Off.
+    <div type="group" class="sdpi-item" style="margin-top:4px">
+      <div class="sdpi-item-label" style="text-align:left;width:100%">Live Mode</div>
     </div>
-    <div class="live-box">
-      <div class="sdpi-item">
-        <div class="sdpi-item-label">Цифры на кнопках</div>
-        <input class="sdpi-item-value" id="liveMode" type="checkbox" checked />
-      </div>
-      <div class="sdpi-item">
-        <div class="sdpi-item-label">Widget URL</div>
-        <input class="sdpi-item-value" id="baseUrl" type="text" placeholder="http://127.0.0.1:19123" />
-      </div>
-      <div class="sdpi-item">
-        <div class="sdpi-item-label">Live display</div>
-        <select class="sdpi-item-value select" id="liveDisplay">
-          <option value="auto">Auto (from preset)</option>
-          <option value="wins">Wins number</option>
-          <option value="losses">Losses number</option>
-          <option value="rank">Rank icon + label</option>
-          <option value="role">Current role</option>
-          <option value="none">Off (this button)</option>
-        </select>
-      </div>
-      <div id="liveStatus" class="live-status">Live: off</div>
-      <div class="hint">Необязательно. Включи, если нужны цифры W/L/ранг на кнопках в реальном времени.</div>
+
+    <div class="sdpi-item">
+      <div class="sdpi-item-label">Цифры</div>
+      <select class="sdpi-item-value select" id="liveMode">
+        <option value="1">ON — показывать W/L/ранг</option>
+        <option value="0">OFF — без цифр</option>
+      </select>
     </div>
+    <div class="sdpi-item">
+      <div class="sdpi-item-label">Widget URL</div>
+      <input class="sdpi-item-value" id="baseUrl" type="text" placeholder="http://127.0.0.1:19123" />
+    </div>
+    <div class="sdpi-item">
+      <div class="sdpi-item-label">На этой кнопке</div>
+      <select class="sdpi-item-value select" id="liveDisplay">
+        <option value="auto">Авто (по пресету)</option>
+        <option value="wins">Число побед</option>
+        <option value="losses">Число поражений</option>
+        <option value="rank">Ранг</option>
+        <option value="role">Роль</option>
+        <option value="none">OFF — без цифр здесь</option>
+      </select>
+    </div>
+    <div id="liveStatus" class="live-status" style="padding:4px 8px 10px">Live: …</div>
 
     <div class="sdpi-item">
       <div class="sdpi-item-label">Preset</div>
@@ -130,16 +130,19 @@
       <input class="sdpi-item-value" id="timeout" type="number" min="500" step="100" value="5000" />
     </div>
 
-    <div class="sdpi-item">
-      <div class="sdpi-item-label">Show status on key</div>
-      <input class="sdpi-item-value" id="showStatus" type="checkbox" checked />
+    <div type="checkbox" class="sdpi-item">
+      <div class="sdpi-item-label">Статус на кнопке</div>
+      <div class="sdpi-item-value">
+        <input id="showStatus" type="checkbox" value="true" checked />
+        <label for="showStatus"><span></span></label>
+      </div>
     </div>
 
     <div class="sdpi-item">
       <button class="sdpi-item-value" id="testBtn" type="button">Test request</button>
     </div>
 
-    <div class="hint">Works silently — no browser tabs. Default port for Widget Stats v2 is 19123.</div>
+    <div class="hint">Нажатия работают всегда. Цифры — только если Live Mode = ON и пресет Win/Loss/Rank.</div>
     <div id="result"></div>
   </div>
 
