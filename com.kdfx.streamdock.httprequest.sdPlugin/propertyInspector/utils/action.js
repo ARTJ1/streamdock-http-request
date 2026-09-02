@@ -24,7 +24,8 @@ WebSocket.prototype.sendToPlugin = function (payload) {
     JSON.stringify({
       event: 'sendToPlugin',
       action: $action,
-      context: $uuid,
+      // Stream Dock expects the action instance context (button), not plugin UUID
+      context: $context || $uuid,
       payload
     })
   );

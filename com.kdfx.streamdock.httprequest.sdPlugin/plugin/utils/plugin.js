@@ -46,10 +46,24 @@ class Plugins {
         this.getGlobalSettings();
       }
       const data = JSON.parse(e.toString());
-      const action = data.action?.split('.').pop();
-      this[action]?.[data.event]?.(data);
+      // Global settings must be applied before action/plugin handlers run.
       if (data.event === 'didReceiveGlobalSettings') {
         Plugins.globalSettings = data.payload?.settings || {};
+      }
+      if (data.event === 'sendToPlugin' && data.context) {
+        Actions.currentContext = data.context;
+        if (data.action) Actions.currentAction = data.action;
+      }
+      if (data.event === 'propertyInspectorDidAppear') {
+        Actions.currentContext = data.context;
+        Actions.currentAction = data.action;
+      }
+      const action = data.action?.split('.').pop();
+      this[action]?.[data.event]?.(data);
+      // Fallback: some hosts deliver sendToPlugin without a routable action suffix
+      if (data.event === 'sendToPlugin' && action && !this[action]) {
+        const anyAction = Object.values(this).find((v) => v && typeof v.sendToPlugin === 'function');
+        anyAction?.sendToPlugin?.(data);
       }
       this[data.event]?.(data);
     });

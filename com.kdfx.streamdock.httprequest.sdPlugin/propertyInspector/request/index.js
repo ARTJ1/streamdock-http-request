@@ -50,7 +50,7 @@ function buildPresets(base) {
 }
 
 let PRESETS = buildPresets(DEFAULT_BASE);
-let $global = { liveMode: false, baseUrl: DEFAULT_BASE };
+let $global = { liveMode: true, baseUrl: DEFAULT_BASE };
 
 function applyToForm(settings = {}) {
   $dom.url.value = settings.url || '';
@@ -115,14 +115,19 @@ const $propEvent = {
   },
   didReceiveGlobalSettings(payload) {
     const settings = payload?.settings || payload || {};
+    const liveMode =
+      settings.liveMode === undefined || settings.liveMode === null
+        ? true
+        : Boolean(settings.liveMode);
     $global = {
-      liveMode: Boolean(settings.liveMode),
+      liveMode,
       baseUrl: settings.baseUrl || DEFAULT_BASE
     };
     $dom.liveMode.checked = $global.liveMode;
     $dom.baseUrl.value = $global.baseUrl;
     PRESETS = buildPresets($global.baseUrl);
-    renderLiveStatus({ liveMode: $global.liveMode, connected: false, deck: null });
+    // Don't wipe connected status — ask plugin for fresh liveStatus
+    $websocket.sendToPlugin({ type: 'getLiveStatus' });
   },
   sendToPropertyInspector(payload) {
     if (!payload) return;
@@ -161,6 +166,10 @@ $dom.preset.addEventListener('change', () => {
 $dom.showStatus.addEventListener('change', saveFromForm);
 
 $dom.liveMode.addEventListener('change', saveLiveGlobal);
+$dom.liveMode.addEventListener('click', () => {
+  // Some Stream Dock PI builds miss change on checkbox — sync on click too
+  setTimeout(saveLiveGlobal, 0);
+});
 $dom.baseUrl.addEventListener('change', () => {
   saveLiveGlobal();
   // Rewrite preset URL to new base if a known preset is selected

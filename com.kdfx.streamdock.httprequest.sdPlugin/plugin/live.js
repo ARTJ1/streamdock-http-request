@@ -1,7 +1,7 @@
 const http = require('http');
 const https = require('https');
 const { URL } = require('url');
-const { log } = require('./utils/plugin');
+const { log, Actions } = require('./utils/plugin');
 
 const DEFAULT_BASE = 'http://127.0.0.1:19123';
 const POLL_MS = 2500;
@@ -163,8 +163,11 @@ class LiveHub {
   }
 
   setGlobal(globalSettings = {}) {
-    // Default off so existing installs keep fire-and-forget behavior until enabled.
-    const enabled = Boolean(globalSettings.liveMode);
+    // Default ON: titles update automatically; user can still uncheck Live Mode.
+    const enabled =
+      globalSettings.liveMode === undefined || globalSettings.liveMode === null
+        ? true
+        : Boolean(globalSettings.liveMode);
     const base = normalizeBase(globalSettings.baseUrl || DEFAULT_BASE);
     const changed = enabled !== this.enabled || base !== this.baseUrl;
     this.enabled = enabled;
@@ -173,6 +176,9 @@ class LiveHub {
       this.restart();
     } else {
       this.ensureRunning();
+    }
+    if (this.enabled) {
+      this.poll();
     }
     this.broadcastStatus();
   }
@@ -318,13 +324,12 @@ class LiveHub {
       const deck = await httpGetJSON(`${this.baseUrl}/api/deck/state`);
       deck.rankImageUrl = absURL(this.baseUrl, deck.rankImageUrl);
       deck.roleImageUrl = absURL(this.baseUrl, deck.roleImageUrl);
+      this.connected = true;
       this.onDeck(deck);
-      if (!this.connected) {
-        // HTTP works even if WS is down
-        this.broadcastStatus();
-      }
+      this.broadcastStatus();
     } catch (err) {
       log.error('LiveHub poll failed', err.message || err);
+      this.connected = false;
       this.broadcastStatus();
     }
   }
@@ -401,10 +406,28 @@ class LiveHub {
   }
 
   broadcastStatus() {
+    const payload = this.statusPayload();
     try {
-      this.plugin.sendToPropertyInspector(this.statusPayload());
+      this.plugin.sendToPropertyInspector(payload);
     } catch {
       /* PI may be closed */
+    }
+    // Also push to every known button context — PI routing is flaky on some hosts
+    try {
+      for (const context of this.buttons.keys()) {
+        const action = Actions.actions[context] || Actions.currentAction;
+        if (!action || !context) continue;
+        this.plugin.ws.send(
+          JSON.stringify({
+            event: 'sendToPropertyInspector',
+            action,
+            context,
+            payload
+          })
+        );
+      }
+    } catch {
+      /* ignore */
     }
   }
 }

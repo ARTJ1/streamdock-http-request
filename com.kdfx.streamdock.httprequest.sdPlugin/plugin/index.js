@@ -222,10 +222,19 @@ async function runRequest(context, settings) {
 
 function applyGlobalFromPlugins() {
   const g = Plugins.globalSettings || {};
-  liveHub.setGlobal({
-    liveMode: Boolean(g.liveMode),
-    baseUrl: g.baseUrl || DEFAULT_BASE
-  });
+  // undefined = first run → Live Mode ON by default
+  const liveMode = g.liveMode === undefined || g.liveMode === null ? true : Boolean(g.liveMode);
+  const baseUrl = g.baseUrl || DEFAULT_BASE;
+  if (g.liveMode === undefined || g.liveMode === null) {
+    const next = { ...g, liveMode: true, baseUrl };
+    Plugins.globalSettings = next;
+    try {
+      plugin.setGlobalSettings(next);
+    } catch {
+      /* host may not be ready yet */
+    }
+  }
+  liveHub.setGlobal({ liveMode, baseUrl });
 }
 
 // Hook global settings updates
