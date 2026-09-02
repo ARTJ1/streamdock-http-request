@@ -50,21 +50,12 @@ class Plugins {
       if (data.event === 'didReceiveGlobalSettings') {
         Plugins.globalSettings = data.payload?.settings || {};
       }
-      if (data.event === 'sendToPlugin' && data.context) {
-        Actions.currentContext = data.context;
+      if (data.event === 'propertyInspectorDidAppear' || data.event === 'sendToPlugin') {
+        if (data.context) Actions.currentContext = data.context;
         if (data.action) Actions.currentAction = data.action;
-      }
-      if (data.event === 'propertyInspectorDidAppear') {
-        Actions.currentContext = data.context;
-        Actions.currentAction = data.action;
       }
       const action = data.action?.split('.').pop();
       this[action]?.[data.event]?.(data);
-      // Fallback: some hosts deliver sendToPlugin without a routable action suffix
-      if (data.event === 'sendToPlugin' && action && !this[action]) {
-        const anyAction = Object.values(this).find((v) => v && typeof v.sendToPlugin === 'function');
-        anyAction?.sendToPlugin?.(data);
-      }
       this[data.event]?.(data);
     });
     Plugins.instance = this;
@@ -116,7 +107,7 @@ class Plugins {
         context,
         payload: {
           target: 0,
-          title: newStr || String(str ?? '')
+          title: newStr !== null ? newStr : String(str ?? '')
         }
       })
     );

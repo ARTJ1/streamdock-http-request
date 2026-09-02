@@ -1,7 +1,7 @@
 const http = require('http');
 const https = require('https');
 const { URL } = require('url');
-const { log, Actions } = require('./utils/plugin');
+const { log } = require('./utils/plugin');
 
 const DEFAULT_BASE = 'http://127.0.0.1:19123';
 const POLL_MS = 2500;
@@ -104,6 +104,15 @@ function absURL(base, maybeRelative) {
   return normalizeBase(base) + (maybeRelative.startsWith('/') ? maybeRelative : `/${maybeRelative}`);
 }
 
+function pathOf(url) {
+  try {
+    return new URL(url).pathname.toLowerCase();
+  } catch {
+    return String(url || '').toLowerCase();
+  }
+}
+
+/** Only win/loss/rank(/role) buttons get live titles — never game/mode/reset/show. */
 function inferDisplay(settings = {}) {
   const explicit = String(settings.liveDisplay || 'auto').toLowerCase();
   if (explicit && explicit !== 'auto') {
@@ -116,12 +125,13 @@ function inferDisplay(settings = {}) {
   if (preset === 'rank_up_tank' || preset === 'rank_up_support' || preset === 'rank_up_damage') return 'rank';
   if (preset === 'rank_down_tank' || preset === 'rank_down_support' || preset === 'rank_down_damage') return 'rank';
   if (preset === 'role_next') return 'role';
+  if (preset && preset !== 'custom') return 'none';
 
-  const url = String(settings.url || '').toLowerCase();
-  if (url.includes('/api/win')) return 'wins';
-  if (url.includes('/api/loss')) return 'losses';
-  if (url.includes('/api/rank')) return 'rank';
-  if (url.includes('/api/role')) return 'role';
+  const path = pathOf(settings.url);
+  if (path === '/api/win' || path === '/api/win/down') return 'wins';
+  if (path === '/api/loss' || path === '/api/loss/down') return 'losses';
+  if (path.startsWith('/api/rank')) return 'rank';
+  if (path.startsWith('/api/role')) return 'role';
   return 'none';
 }
 
@@ -158,18 +168,19 @@ class LiveHub {
     this.enabled = false;
     this.connected = false;
     this.lastDeck = null;
-    this.imageCache = new Map(); // url -> dataUrl
-    this.applying = false;
+    this.imageCache = new Map();
+    this.lastTitles = new Map(); // context -> last title string
+    this._pollInFlight = false;
   }
 
   setGlobal(globalSettings = {}) {
-    // Default ON: titles update automatically; user can still uncheck Live Mode.
     const enabled =
       globalSettings.liveMode === undefined || globalSettings.liveMode === null
         ? true
         : Boolean(globalSettings.liveMode);
     const base = normalizeBase(globalSettings.baseUrl || DEFAULT_BASE);
     const changed = enabled !== this.enabled || base !== this.baseUrl;
+    const wasEnabled = this.enabled;
     this.enabled = enabled;
     this.baseUrl = base;
     if (changed) {
@@ -177,7 +188,9 @@ class LiveHub {
     } else {
       this.ensureRunning();
     }
-    if (this.enabled) {
+    if (!this.enabled && wasEnabled) {
+      this.clearAllTitles();
+    } else if (this.enabled) {
       this.poll();
     }
     this.broadcastStatus();
@@ -186,7 +199,9 @@ class LiveHub {
   register(context, settings) {
     this.buttons.set(context, settings || {});
     this.ensureRunning();
-    if (this.lastDeck) {
+    if (!this.enabled || inferDisplay(settings || {}) === 'none') {
+      this.clearTitle(context);
+    } else if (this.lastDeck) {
       this.applyOne(context, settings || {}, this.lastDeck);
     }
     this.broadcastStatus();
@@ -194,6 +209,7 @@ class LiveHub {
 
   unregister(context) {
     this.buttons.delete(context);
+    this.lastTitles.delete(context);
     if (this.buttons.size === 0) {
       this.stop();
     }
@@ -203,6 +219,10 @@ class LiveHub {
   updateSettings(context, settings) {
     if (!this.buttons.has(context)) return;
     this.buttons.set(context, settings || {});
+    if (!this.enabled || inferDisplay(settings || {}) === 'none') {
+      this.clearTitle(context);
+      return;
+    }
     if (this.lastDeck) {
       this.applyOne(context, settings || {}, this.lastDeck);
     }
@@ -293,7 +313,6 @@ class LiveHub {
         try {
           const msg = JSON.parse(String(raw));
           const deck = deckFromMessage(msg, this.baseUrl);
-          // If WS deck lacks rankLabel (old server), refresh via HTTP
           if (!deck.rankLabel && deck.rank != null) {
             this.poll();
             return;
@@ -319,18 +338,24 @@ class LiveHub {
   }
 
   async poll() {
-    if (!this.enabled || this.buttons.size === 0) return;
+    if (!this.enabled || this.buttons.size === 0 || this._pollInFlight) return;
+    this._pollInFlight = true;
     try {
       const deck = await httpGetJSON(`${this.baseUrl}/api/deck/state`);
       deck.rankImageUrl = absURL(this.baseUrl, deck.rankImageUrl);
       deck.roleImageUrl = absURL(this.baseUrl, deck.roleImageUrl);
+      const was = this.connected;
       this.connected = true;
       this.onDeck(deck);
-      this.broadcastStatus();
+      if (!was) this.broadcastStatus();
     } catch (err) {
       log.error('LiveHub poll failed', err.message || err);
-      this.connected = false;
-      this.broadcastStatus();
+      if (this.connected) {
+        this.connected = false;
+        this.broadcastStatus();
+      }
+    } finally {
+      this._pollInFlight = false;
     }
   }
 
@@ -341,28 +366,56 @@ class LiveHub {
     }
   }
 
+  clearTitle(context) {
+    if (this.lastTitles.get(context) === '') return;
+    this.lastTitles.set(context, '');
+    try {
+      this.plugin.setTitle(context, '');
+    } catch {
+      /* ignore */
+    }
+  }
+
+  clearAllTitles() {
+    for (const context of this.buttons.keys()) {
+      this.clearTitle(context);
+    }
+  }
+
+  writeTitle(context, title) {
+    const next = String(title ?? '');
+    if (this.lastTitles.get(context) === next) return;
+    this.lastTitles.set(context, next);
+    this.plugin.setTitle(context, next);
+  }
+
   applyOne(context, settings, deck) {
-    if (!this.enabled) return;
+    if (!this.enabled) {
+      this.clearTitle(context);
+      return;
+    }
     const display = inferDisplay(settings);
-    if (display === 'none') return;
+    if (display === 'none') {
+      this.clearTitle(context);
+      return;
+    }
 
     if (display === 'wins') {
-      this.plugin.setTitle(context, String(deck.wins ?? 0));
+      this.writeTitle(context, String(deck.wins ?? 0));
       return;
     }
     if (display === 'losses') {
-      this.plugin.setTitle(context, String(deck.losses ?? 0));
+      this.writeTitle(context, String(deck.losses ?? 0));
       return;
     }
     if (display === 'rank') {
       const label = deck.rankShort || deck.rankLabel || String(deck.rank ?? '');
-      this.plugin.setTitle(context, label);
-      // Rank is short text on C4 live pack — do not replace button art with rank PNG
+      this.writeTitle(context, label);
       return;
     }
     if (display === 'role') {
       const role = String(deck.role || '').toUpperCase() || 'ROLE';
-      this.plugin.setTitle(context, role);
+      this.writeTitle(context, role);
     }
   }
 
@@ -406,28 +459,10 @@ class LiveHub {
   }
 
   broadcastStatus() {
-    const payload = this.statusPayload();
     try {
-      this.plugin.sendToPropertyInspector(payload);
+      this.plugin.sendToPropertyInspector(this.statusPayload());
     } catch {
       /* PI may be closed */
-    }
-    // Also push to every known button context — PI routing is flaky on some hosts
-    try {
-      for (const context of this.buttons.keys()) {
-        const action = Actions.actions[context] || Actions.currentAction;
-        if (!action || !context) continue;
-        this.plugin.ws.send(
-          JSON.stringify({
-            event: 'sendToPropertyInspector',
-            action,
-            context,
-            payload
-          })
-        );
-      }
-    } catch {
-      /* ignore */
     }
   }
 }

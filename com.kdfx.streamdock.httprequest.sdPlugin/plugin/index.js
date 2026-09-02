@@ -149,29 +149,68 @@ function tryApplySnapshotBody(body, baseUrl) {
 }
 
 const _lastPress = new Map(); // context -> ts — avoid double fire from keyDown+keyUp
+const _inFlight = new Set();
 
 async function runRequest(context, settings) {
   const now = Date.now();
   const prev = _lastPress.get(context) || 0;
-  if (now - prev < 350) return false;
+  if (now - prev < 400) return false;
+  if (_inFlight.has(context)) return false;
   _lastPress.set(context, now);
+  _inFlight.add(context);
 
-  const cfg = Object.assign({}, DEFAULTS, settings || {});
-  // Display-only rank button: refresh live state, don't mutate
-  if (cfg.preset === 'rank' || String(cfg.url || '').includes('/api/deck/state')) {
+  try {
+    const cfg = Object.assign({}, DEFAULTS, settings || {});
+    // Display-only rank button: refresh live state, don't mutate
+    if (cfg.preset === 'rank' || String(cfg.url || '').includes('/api/deck/state')) {
+      try {
+        await liveHub.poll();
+        if (cfg.showStatus) plugin.showOk(context);
+        plugin.sendToPropertyInspector({
+          type: 'result',
+          ok: true,
+          statusCode: 200,
+          body: liveHub.lastDeck ? JSON.stringify(liveHub.lastDeck).slice(0, 500) : 'refreshed'
+        });
+        return true;
+      } catch (err) {
+        if (cfg.showStatus !== false) plugin.showAlert(context);
+        plugin.sendToPropertyInspector({
+          type: 'result',
+          ok: false,
+          statusCode: 0,
+          body: String(err.message || err)
+        });
+        return false;
+      }
+    }
+
     try {
-      await liveHub.poll();
-      if (cfg.showStatus) plugin.showOk(context);
+      const result = await sendHttpRequest(cfg);
+      const ok = result.statusCode >= 200 && result.statusCode < 300;
+      log.info(`${cfg.method} ${cfg.url} -> ${result.statusCode}`);
+      if (cfg.showStatus) {
+        if (ok) plugin.showOk(context);
+        else plugin.showAlert(context);
+      }
+      if (ok) {
+        const applied = tryApplySnapshotBody(result.body, liveHub.baseUrl);
+        if (!applied && liveHub.enabled) {
+          liveHub.poll();
+        }
+      }
       plugin.sendToPropertyInspector({
         type: 'result',
-        ok: true,
-        statusCode: 200,
-        body: liveHub.lastDeck ? JSON.stringify(liveHub.lastDeck).slice(0, 500) : 'refreshed'
+        ok,
+        statusCode: result.statusCode,
+        body: result.body?.slice(0, 500) || ''
       });
-      liveHub.broadcastStatus();
-      return true;
+      return ok;
     } catch (err) {
-      if (cfg.showStatus !== false) plugin.showAlert(context);
+      log.error(`${cfg.method} ${cfg.url} failed:`, err.message || err);
+      if (cfg.showStatus !== false) {
+        plugin.showAlert(context);
+      }
       plugin.sendToPropertyInspector({
         type: 'result',
         ok: false,
@@ -180,43 +219,8 @@ async function runRequest(context, settings) {
       });
       return false;
     }
-  }
-
-  try {
-    const result = await sendHttpRequest(cfg);
-    const ok = result.statusCode >= 200 && result.statusCode < 300;
-    log.info(`${cfg.method} ${cfg.url} -> ${result.statusCode}`);
-    if (cfg.showStatus) {
-      if (ok) plugin.showOk(context);
-      else plugin.showAlert(context);
-    }
-    if (ok) {
-      const applied = tryApplySnapshotBody(result.body, liveHub.baseUrl);
-      if (!applied && liveHub.enabled) {
-        // WS may already push; poll as backup
-        liveHub.poll();
-      }
-    }
-    plugin.sendToPropertyInspector({
-      type: 'result',
-      ok,
-      statusCode: result.statusCode,
-      body: result.body?.slice(0, 500) || ''
-    });
-    liveHub.broadcastStatus();
-    return ok;
-  } catch (err) {
-    log.error(`${cfg.method} ${cfg.url} failed:`, err.message || err);
-    if (cfg.showStatus !== false) {
-      plugin.showAlert(context);
-    }
-    plugin.sendToPropertyInspector({
-      type: 'result',
-      ok: false,
-      statusCode: 0,
-      body: String(err.message || err)
-    });
-    return false;
+  } finally {
+    _inFlight.delete(context);
   }
 }
 
@@ -286,7 +290,6 @@ plugin.request = new Actions({
       };
       plugin.setGlobalSettings(next);
       liveHub.setGlobal(next);
-      liveHub.broadcastStatus();
       return;
     }
     if (payload?.type === 'getLiveStatus') {
