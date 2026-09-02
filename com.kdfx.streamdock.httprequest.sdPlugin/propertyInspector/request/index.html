@@ -34,7 +34,11 @@
   </style>
 </head>
 <body>
-  <div class="sdpi-wrapper">
+  <div class="sdpi-wrapper" style="display:block">
+    <div class="hint" style="padding:8px;margin:0 0 8px;background:#1a3a2a;border:1px solid #2e7d4f;border-radius:4px;opacity:1">
+      Нажатия работают всегда (без Live Mode). Выбери пресет Win/Loss/Rank ниже.
+      Live Mode — только чтобы цифры сами появлялись на кнопках.
+    </div>
     <div class="live-box">
       <div class="sdpi-item">
         <div class="sdpi-item-label">Live Mode</div>
@@ -56,7 +60,7 @@
         </select>
       </div>
       <div id="liveStatus" class="live-status">Live: off</div>
-      <div class="hint">Live Mode connects to the widget and updates button titles/icons when stats change (deck, admin, automation).</div>
+      <div class="hint">Необязательно. Включи, если нужны цифры W/L/ранг на кнопках в реальном времени.</div>
     </div>
 
     <div class="sdpi-item">

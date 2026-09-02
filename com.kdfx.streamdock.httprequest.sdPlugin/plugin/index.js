@@ -148,7 +148,14 @@ function tryApplySnapshotBody(body, baseUrl) {
   return false;
 }
 
+const _lastPress = new Map(); // context -> ts — avoid double fire from keyDown+keyUp
+
 async function runRequest(context, settings) {
+  const now = Date.now();
+  const prev = _lastPress.get(context) || 0;
+  if (now - prev < 350) return false;
+  _lastPress.set(context, now);
+
   const cfg = Object.assign({}, DEFAULTS, settings || {});
   // Display-only rank button: refresh live state, don't mutate
   if (cfg.preset === 'rank' || String(cfg.url || '').includes('/api/deck/state')) {
@@ -249,6 +256,11 @@ plugin.request = new Actions({
   },
 
   async keyDown({ context }) {
+    await runRequest(context, this.data[context]);
+  },
+
+  // Some Stream Dock builds deliver presses as keyUp only.
+  async keyUp({ context }) {
     await runRequest(context, this.data[context]);
   },
 
