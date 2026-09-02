@@ -1,6 +1,6 @@
 {
   "name": "streamdock-http-request",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": "KDFX",
   "main": "index.js",
   "description": "Silent HTTP requests for Stream Dock / AJAZZ",

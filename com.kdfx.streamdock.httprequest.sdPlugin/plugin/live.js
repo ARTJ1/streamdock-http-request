@@ -157,12 +157,9 @@ function inferRankRole(settings = {}) {
   return '';
 }
 
-/** Lift title toward visual center when Stream Dock cached TitleAlignment=bottom. */
+/** Plain title — no newline padding (breaks Stream Dock size/align controls). */
 function formatLiveTitle(text) {
-  const t = String(text ?? '');
-  if (!t) return '';
-  // Trailing newlines raise the value when alignment is bottom (common cache).
-  return `${t}\n\n`;
+  return String(text ?? '');
 }
 
 function deckFromMessage(msg, base) {
