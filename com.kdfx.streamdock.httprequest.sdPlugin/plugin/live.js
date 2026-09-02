@@ -116,14 +116,15 @@ function pathOf(url) {
 function inferDisplay(settings = {}) {
   const explicit = String(settings.liveDisplay || 'auto').toLowerCase();
   if (explicit && explicit !== 'auto') {
-    return explicit === 'off' || explicit === 'none' ? 'none' : explicit;
+    if (explicit === 'off' || explicit === 'none') return 'none';
+    if (explicit === 'rank_tank' || explicit === 'rank_support' || explicit === 'rank_damage') return 'rank';
+    return explicit;
   }
   const preset = String(settings.preset || '').toLowerCase();
   if (preset === 'win' || preset === 'win_down') return 'wins';
   if (preset === 'loss' || preset === 'loss_down') return 'losses';
   if (preset === 'rank' || preset === 'rank_up' || preset === 'rank_down') return 'rank';
-  if (preset === 'rank_up_tank' || preset === 'rank_up_support' || preset === 'rank_up_damage') return 'rank';
-  if (preset === 'rank_down_tank' || preset === 'rank_down_support' || preset === 'rank_down_damage') return 'rank';
+  if (preset.startsWith('rank_up_') || preset.startsWith('rank_down_')) return 'rank';
   if (preset === 'role_next') return 'role';
   if (preset && preset !== 'custom') return 'none';
 
@@ -133,6 +134,35 @@ function inferDisplay(settings = {}) {
   if (path.startsWith('/api/rank')) return 'rank';
   if (path.startsWith('/api/role')) return 'role';
   return 'none';
+}
+
+/** tank|support|damage for role-specific rank buttons, else ''. */
+function inferRankRole(settings = {}) {
+  const explicit = String(settings.liveDisplay || 'auto').toLowerCase();
+  if (explicit === 'rank_tank') return 'tank';
+  if (explicit === 'rank_support') return 'support';
+  if (explicit === 'rank_damage') return 'damage';
+
+  const preset = String(settings.preset || '').toLowerCase();
+  const pm = preset.match(/rank_(?:up|down)_(tank|support|damage)$/);
+  if (pm) return pm[1];
+
+  try {
+    const u = new URL(String(settings.url || ''), 'http://local');
+    const role = String(u.searchParams.get('role') || '').toLowerCase();
+    if (role === 'tank' || role === 'support' || role === 'damage') return role;
+  } catch {
+    /* ignore */
+  }
+  return '';
+}
+
+/** Lift title toward visual center when Stream Dock cached TitleAlignment=bottom. */
+function formatLiveTitle(text) {
+  const t = String(text ?? '');
+  if (!t) return '';
+  // Trailing newlines raise the value when alignment is bottom (common cache).
+  return `${t}\n\n`;
 }
 
 function deckFromMessage(msg, base) {
@@ -148,12 +178,14 @@ function deckFromMessage(msg, base) {
     losses: view.losses || 0,
     rank: view.rank || 0,
     rankLabel: '',
+    rankShort: '',
     rankImageUrl: '',
     role: view.role || '',
     roleImageUrl: '',
     game: view.game || '',
     mode: view.mode || '',
-    skinId: msg?.settings?.skinId || ''
+    skinId: msg?.settings?.skinId || '',
+    roles: msg?.state?.roles ? undefined : undefined
   };
 }
 
@@ -401,21 +433,26 @@ class LiveHub {
     }
 
     if (display === 'wins') {
-      this.writeTitle(context, String(deck.wins ?? 0));
+      this.writeTitle(context, formatLiveTitle(deck.wins ?? 0));
       return;
     }
     if (display === 'losses') {
-      this.writeTitle(context, String(deck.losses ?? 0));
+      this.writeTitle(context, formatLiveTitle(deck.losses ?? 0));
       return;
     }
     if (display === 'rank') {
-      const label = deck.rankShort || deck.rankLabel || String(deck.rank ?? '');
-      this.writeTitle(context, label);
+      const role = inferRankRole(settings);
+      let label = deck.rankShort || deck.rankLabel || String(deck.rank ?? '');
+      if (role && deck.roles && deck.roles[role]) {
+        const rr = deck.roles[role];
+        label = rr.rankShort || rr.rankLabel || label;
+      }
+      this.writeTitle(context, formatLiveTitle(label));
       return;
     }
     if (display === 'role') {
       const role = String(deck.role || '').toUpperCase() || 'ROLE';
-      this.writeTitle(context, role);
+      this.writeTitle(context, formatLiveTitle(role));
     }
   }
 
@@ -471,6 +508,7 @@ module.exports = {
   LiveHub,
   normalizeBase,
   inferDisplay,
+  inferRankRole,
   DEFAULT_BASE,
   httpGetJSON
 };

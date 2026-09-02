@@ -56,7 +56,10 @@
         <option value="auto">Авто (по пресету)</option>
         <option value="wins">Число побед</option>
         <option value="losses">Число поражений</option>
-        <option value="rank">Ранг</option>
+        <option value="rank">Ранг (текущая роль)</option>
+        <option value="rank_tank">Ранг Tank</option>
+        <option value="rank_support">Ранг Support</option>
+        <option value="rank_damage">Ранг Damage</option>
         <option value="role">Роль</option>
         <option value="none">OFF — без цифр здесь</option>
       </select>
@@ -142,7 +145,10 @@
       <button class="sdpi-item-value" id="testBtn" type="button">Test request</button>
     </div>
 
-    <div class="hint">Нажатия работают всегда. Цифры — только если Live Mode = ON и пресет Win/Loss/Rank.</div>
+    <div class="hint">Нажатия работают всегда. Цифры — Live Mode ON + пресет Win/Loss/Rank.
+      Ранг по ролям: пресет Rank↑ Tank/Support/Damage (или «На этой кнопке» → Ранг Tank…).
+      Если цифры внизу/мелкие: в Stream Dock у заголовка кнопки поставь Align=middle Size=большой,
+      либо удали кнопку и поставь HTTP Request заново (кэш шрифта).</div>
     <div id="result"></div>
   </div>
 

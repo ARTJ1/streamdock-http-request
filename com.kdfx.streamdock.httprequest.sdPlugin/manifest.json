@@ -8,7 +8,9 @@
         {
           "Image": "static/action.png",
           "TitleAlignment": "middle",
-          "FontSize": "32"
+          "FontSize": "48",
+          "FontStyle": "Bold",
+          "TitleColor": "#ffffff"
         }
       ],
       "Controllers": ["Keypad"],
@@ -28,7 +30,7 @@
   "Description": "Silent HTTP requests for AJAZZ / Stream Dock with Live Mode for OBS Widget Stats.",
   "Category": "HTTP Request",
   "CategoryIcon": "static/icon.png",
-  "Version": "1.1.4",
+  "Version": "1.2.0",
   "URL": "https://github.com",
   "OS": [
     {
